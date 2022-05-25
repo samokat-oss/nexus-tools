@@ -3,8 +3,11 @@ const childProcess = require("child_process");
 const path = require("path");
 const https = require("https");
 
+const nexusHost = 'https://nexus.mysite.ru';
+
 const auth = process.argv[2] ||
-    (fs.existsSync('../.samokatNexus') ? fs.readFileSync('../.samokatNexus', 'utf8').trim() : '');
+    // Чтобы не вводить креды каждый раз, можно их из файла читать
+    (fs.existsSync('../.nexusCredentials') ? fs.readFileSync('../.nexusCredentials', 'utf8').trim() : '');
 
 const dir = path.join(__dirname, 'nexus');
 const tokenFile = path.join(__dirname, 'token.txt');
@@ -16,6 +19,7 @@ let count = 0;
 const all = new Map();
 
 module.exports = {
+    nexusHost,
     auth,
     run,
     dir,

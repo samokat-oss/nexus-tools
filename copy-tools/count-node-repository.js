@@ -1,9 +1,9 @@
 const fs = require('fs');
 
 
-const {auth, run, dir, request, addError, errors, main, runSh, increaseCount, all} = require('./utils');
+const {auth, run, dir, request, addError, errors, main, runSh, increaseCount, all, nexusHost} = require('./utils');
 
-const url = 'https://nexus.samokat.io/service/rest/v1/search?repository=nexus-npm-proxy'
+const url = nexusHost + '/service/rest/v1/search?repository=nexus-npm-proxy'
 
 main(url, processChunk, () => {
     const allArray = Array.from(all.values());

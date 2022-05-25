@@ -1,5 +1,5 @@
-const proxy = require('./nexus-npm-proxy.json');
-const external = require('./nexus-npm-external.json');
+const proxy = require('./proxy.json');
+const external = require('./external.json');
 const fs = require("fs");
 // const {processChunk} = require("./copy-npm-repository");
 

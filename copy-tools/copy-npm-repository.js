@@ -2,14 +2,16 @@ const fs = require('fs');
 
 const path = require('path');
 const https = require('https');
-const {auth, run, dir, request, addError, errors, main, runSh, increaseCount} = require('./utils');
+const {auth, run, dir, request, addError, errors, main, runSh, increaseCount, nexusHost} = require('./utils');
 
-const url = 'https://nexus.samokat.io/service/rest/v1/search?repository=nexus-npm-proxy'
+
+const fromRepository = nexusHost + '/service/rest/v1/search?repository=nexus-npm-proxy'
+const toRepository = nexusHost + '/service/rest/v1/components?repository=nexus-npm-external'
 
 let count = 0;
 
 
-main(url, processChunk).catch((e) => {
+main(fromRepository, processChunk).catch((e) => {
     console.log('\n\nMAIN ERROR', e);
 });
 
@@ -74,7 +76,7 @@ function makeSh(fullPath) {
 
     const res =
         `#!/bin/bash
-         curl -X POST -u ${auth} "https://nexus.samokat.io/service/rest/v1/components?repository=nexus-npm-external" -H "accept: application/json" -H "Content-Type: multipart/form-data" -F "npm.asset=@${fullPath};type=application/x-gzip";`
+         curl -X POST -u ${auth} "${toRepository}" -H "accept: application/json" -H "Content-Type: multipart/form-data" -F "npm.asset=@${fullPath};type=application/x-gzip";`
 
     runSh(res);
 }

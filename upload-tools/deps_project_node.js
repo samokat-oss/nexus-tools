@@ -7,6 +7,7 @@ const {
 } = require("./utils");
 const path = require("path");
 const fs = require("fs");
+const {nexusHost} = require("../copy-tools/utils");
 
 main().catch((e) => {
     console.log('Ошибка main', e);
@@ -23,14 +24,10 @@ async function main() {
     fs.copyFileSync(path.join(prDir, 'package.json'), path.join(dir, 'package.json'));
     // fs.copyFileSync(path.join(prDir, 'package-lock.json'), path.join(dir, 'package-lock.json'));
 
-
+// тут можно ввести свои scoped пакеты, которые уже лежат в нексусе
     const npmrcContent = `
-@my-samokat:registry=https://nexus.samokat.io/repository/nexus-npm
-@samokat:registry=https://nexus.samokat.io/repository/nexus-npm
-@logistics:registry=https://nexus.samokat.io/repository/nexus-npm
-@core-colibri:registry=https://nexus.samokat.io/repository/nexus-npm
-@timelabse:registry=https://nexus.samokat.io/repository/nexus-npm
-@srp:registry=https://nexus.samokat.io/repository/nexus-npm
+@myscope:registry=${nexusHost}/repository/nexus-npm
+
 save-exact=true
 _auth=${Buffer.from(auth).toString('base64')}
     `

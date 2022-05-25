@@ -1,9 +1,9 @@
 const fs = require('fs');
 
 
-const {auth, run, dir, request, addError, errors, main, runSh, increaseCount, all} = require('./utils');
+const {auth, run, dir, request, addError, errors, main, runSh, increaseCount, all, nexusHost} = require('./utils');
 
-const url = 'https://nexus.samokat.io/service/rest/v1/search?repository=maven-central'
+const url = nexusHost + '/service/rest/v1/search?repository=maven-central'
 
 main(url, processChunk, () => {
     const allArray = Array.from(all.values());
@@ -21,8 +21,6 @@ async function processChunk(res, all) {
     await Promise.all(res.items.map(async (item) => {
         if (all.has(item.id)) {
             addError(new Error(`Повтор либы ${item.group} ${item.name} ${item.version}`));
-            // return;
-            // throw item.name;
         }
 
         all.set(item.id, item);

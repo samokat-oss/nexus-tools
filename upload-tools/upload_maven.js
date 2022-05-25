@@ -1,5 +1,6 @@
 const {runSh, assetsDir, auth, artifactsDir, downloadAsset, makeDirs} = require("./utils");
 const path = require("path");
+const {nexusHost} = require("../copy-tools/utils");
 
 main().catch((e) => {
     console.log('Ошибка main', e);
@@ -73,7 +74,7 @@ async function main() {
         const res = [
             'curl -X POST -u',
             auth,
-            '"https://nexus.samokat.io/service/rest/v1/components?repository=maven-central"',
+            `"${nexusHost}/service/rest/v1/components?repository=maven-central"`,
 
             `-F "maven2.groupId=${group}"`,
             `-F "maven2.artifactId=${name}"`,

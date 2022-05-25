@@ -3,11 +3,12 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-const {auth, run, dir, request, addError, errors, main, runSh, increaseCount} = require('./utils');
+const {auth, run, dir, request, addError, errors, main, runSh, increaseCount, nexusHost} = require('./utils');
 
-const url = 'https://nexus.samokat.io/service/rest/v1/search?repository=maven-central'
+const fromRepository = nexusHost + '/service/rest/v1/search?repository=maven-central'
+const toRepository = nexusHost + '/service/rest/v1/components?repository=maven-central-backup'
 
-main(url, processChunk).catch((e) => {
+main(fromRepository, processChunk).catch((e) => {
     console.log('\n\nMAIN ERROR', e);
 });
 
@@ -32,7 +33,7 @@ function makeSh({group, name, version, files}) {
     const res = [
         '#!/bin/bash\n\ncurl --silent -v -X POST -u',
         auth,
-        '"https://nexus.samokat.io/service/rest/v1/components?repository=maven-central-backup"',
+        `"${toRepository}"`,
 
         `-F "maven2.groupId=${group}"`,
         `-F "maven2.artifactId=${name}"`,
@@ -41,15 +42,6 @@ function makeSh({group, name, version, files}) {
 
         assetString
     ].join(' ');
-
-
-    // console.log('res', res);
-    // curl -v -u admin:admin123 -F "maven2.generate-pom=true" -F "maven2.groupId=com.example" -F "maven2.artifactId=commercial-product"
-    // -F "maven2.packaging=jar"
-    // -F "version=1.0.0"
-    // -F "maven2.asset1=@/absolute/path/to/the/local/file/product.jar;type=application/java-archive"
-    // -F "maven2.asset1.extension=jar"
-    // "http://localhost:8081/service/rest/v1/components?repository=maven-third-party"
 
     runSh(res);
 }
@@ -66,8 +58,6 @@ function processAsset(item) {
         const file = fs.createWriteStream(fullPath);
 
         files.push(fullPath);
-
-        // console.log('asset', item);
 
         try {
             await new Promise((resolve, reject) => {
@@ -112,8 +102,6 @@ async function processChunk(res, all) {
     await Promise.all(res.items.map(async (item) => {
         if (all.has(item.id)) {
             addError(new Error(`Повтор либы ${item.group} ${item.name} ${item.version}`));
-            // return;
-            // throw item.name;
         }
 
         all.set(item.id, item);

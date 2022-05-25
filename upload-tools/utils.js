@@ -4,8 +4,11 @@ const path = require("path");
 const https = require("https");
 const {Version} = require("./Version");
 
-const auth = (fs.existsSync('../.samokatNexus') ?
-        fs.readFileSync('../.samokatNexus', 'utf8').trim() : ''
+const nexusHost = 'https://nexus.mysite.ru';
+
+// Чтобы не вводить креды каждый раз, можно их из файла читать
+const auth = (fs.existsSync('../.nexusCredentials') ?
+        fs.readFileSync('../.nexusCredentials', 'utf8').trim() : ''
     ) || process.argv[2];
 
 const packageName = process.argv.slice(3).join(' ');
@@ -152,7 +155,7 @@ function makeInitFiles() {
 function installPackages() {
 
     console.log('Устанавливаем пакеты:\n', `'${packageName}'`);
-    run('npm' ,['install', '--ignore-scripts', ...packageName.split(' ')], {
+    run('npm' ,['install', ...packageName.split(' ')], {
         cwd: dir
     });
 }
@@ -174,7 +177,7 @@ async function getListOfNewDeps(deps, repo = ['nexus-npm-group']) {
         let counter = 0;
 
         await Promise.all(repo.map(async (repoName) => {
-            await request(`https://nexus.samokat.io/service/rest/v1/search?repository=${repoName}&group=${group}&name=${name}&version=${version}`, true).then((res) => {
+            await request(`${nexusHost}/service/rest/v1/search?repository=${repoName}&group=${group}&name=${name}&version=${version}`, true).then((res) => {
 
                 const realItems = res.items.filter((item) => (
                     item.group == (group || null) &&
